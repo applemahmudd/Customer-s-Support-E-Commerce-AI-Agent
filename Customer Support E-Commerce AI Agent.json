@@ -1,0 +1,142 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "q": "in:inbox -from:me"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -320,
+        -16
+      ],
+      "id": "428a7f85-fb54-46dc-b5a9-e0debdbe44fe",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Ds3y1i1Zfyje8eUP",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI customer support agent for an online clothing store in Bangladesh.\n\nProducts:\n- Shirt: 400 BDT\n- Pant: 300 BDT\n- Available sizes: L, XL, XXL\n- Delivery: All over Bangladesh\n- Delivery charge: FREE\n- Payment: Cash on Delivery\n\nAnswer customer questions accurately and professionally.\nHandle product questions, delivery questions, payment questions, and orders.\nFor orders, collect customer name, phone number, address, product, size and quantity.\nNever invent information.\nNever escalate to a human.\nReply directly to the customer's latest message.\n\nCustomer's latest email:\n{{ $('Gmail Trigger').item.json.snippet }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -112,
+        -16
+      ],
+      "id": "90141d48-0807-4888-a71d-3c4cbfdc146a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        192
+      ],
+      "id": "f01e8848-0e1b-4e73-b714-c76c6215fd24",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "Bw8gbL0QHJGn0EDv",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        -16
+      ],
+      "id": "47ad48fa-ac77-4e01-92a2-8f9d5b64bd22",
+      "name": "Reply to a message",
+      "webhookId": "98d63347-7ab9-4072-83bf-2937bc7bcf51",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Ds3y1i1Zfyje8eUP",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "50075d8b-6c0c-43d8-915e-006a9b0a2df5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b04cb212b72c6cb0846d49ff1bcdc04778a42a6f9efad2200910872ec9e170c5"
+  },
+  "nodeGroups": [],
+  "id": "5AgWFyJHLDiCrZA7",
+  "tags": []
+}
